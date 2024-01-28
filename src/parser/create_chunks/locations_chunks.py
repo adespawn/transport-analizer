@@ -4,6 +4,7 @@ import json
 import os
 
 import src.util.config as config
+from src.util.data_util import parse_time
 
 base_distance: int = 600
 
@@ -11,8 +12,8 @@ base_distance: int = 600
 def get_time_diff(line, previous):
     current_time, skip_day_c = valid_time(line['Time'])
     previous_time, skip_day_p = valid_time(previous['Time'])
-    current_time = parser.parse(current_time)
-    previous_time = parser.parse(previous_time)
+    current_time = parse_time(current_time)
+    previous_time = parse_time(previous_time)
     val = (current_time - previous_time).total_seconds() + (skip_day_c - skip_day_p) * 60
     return val
 
@@ -48,7 +49,7 @@ def valid_time(time):
 
 def minute_stamp(time):
     new_time, add_day = valid_time(time)
-    return round(parser.parse(new_time).timestamp() / 60) + add_day
+    return round(parse_time(new_time).timestamp() / 60) + add_day
 
 
 class SingleChunk:
@@ -128,17 +129,12 @@ class SingleChunk:
             line['last'] = None
             line['speed'] = 0
             if not isinstance(e, AttributeError):
-                print("WWW")
                 print(e.with_traceback)
-                # raise
         return line
 
     def add_expected_stops(self, my_time):
         while self.schedule_index < len(self.schedule):
             element = self.schedule[self.schedule_index]
-
-            if len(self.schedule) > 0 and '4204_713' in self.file_name:
-                pass
             if element[0] - 5 > my_time:
                 break
             self.schedule_index += 1
@@ -151,7 +147,8 @@ class SingleChunk:
             try:
                 element = self.current_schedule[i]
                 distance = get_location_diff(element, line)
-                if element['reached'] is True and distance > base_distance:
+                time_diff = get_time_diff(line, element)
+                if (element['reached'] is True and distance > base_distance) or time_diff > 60 * 60:
                     self.on_time_res.write(json.dumps(element) + '\n')
                     self.current_schedule.pop(i)
                     i -= 1
@@ -160,7 +157,7 @@ class SingleChunk:
                     element['reached'] = True
                     element['min_distance'] = distance
                     element['time_reached'] = line['Time']
-                    element['delay'] = get_time_diff(line, element)
+                    element['delay'] = time_diff
 
                 self.current_schedule[i] = element
             except IndexError:
@@ -191,8 +188,6 @@ class SingleChunk:
                     added.add(line_t)
                     self.schedule.append((time, line))
             self.schedule.sort(key=lambda x: x[0])
-            if len(self.schedule) > 100:
-                pass
 
 
 def chunk_desc(line):

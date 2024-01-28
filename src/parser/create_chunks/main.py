@@ -30,7 +30,7 @@ def expected_locations_chunks():
 
 def create_chunks():
     logging.info('Creating stops chunks...')
-    # expected_locations_chunks()
+    expected_locations_chunks()
     logging.info('Creating vehicle chunks...')
     create_location_chunks()
 

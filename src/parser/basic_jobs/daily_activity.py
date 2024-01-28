@@ -9,6 +9,7 @@ import matplotlib.dates
 
 import src.parser.analize_chunks.job as job
 import src.util.config as config
+from src.util.data_util import parse_time, average_data
 from src.util.plots import hourly_plot
 
 
@@ -16,11 +17,9 @@ def time_plot_2(data):
     plt.clf()
     plt.close()
     plt.cla()
-    time = [parser.parse(e1) for e1, e2 in data]
+    time = [parse_time(e1) for e1, e2 in data]
     values = [e2 for e1, e2 in data]
     plt.gcf().autofmt_xdate()
-    fig, ax = plt.subplots()
-    # ax.xaxis.set_major_locator(ticker.MaxNLocator(integer=6))
     plt.plot(time, values)
     plt.xlabel('Time')
     plt.ylabel('Count')
@@ -67,8 +66,8 @@ class DailyActivity(job.Job):
             daily_file.write(day[0] + ', ' + str(day[1]) + '\n')
         hourly_file.close()
         daily_file.close()
-        hourly_plot(sorted_hourly, 'Count', 'hourly_activity.png')
-        time_plot_2(sorted_daily)
+        hourly_plot(average_data(sorted_hourly, 10), 'Count', 'hourly_activity.png')
+        time_plot_2(average_data(sorted_daily, 10))
 
 
 def get_job():

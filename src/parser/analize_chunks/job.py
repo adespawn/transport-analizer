@@ -5,6 +5,9 @@ class Job:
     def do_job(self, chunk):
         pass
 
+    def schedule_job(self, chunk):
+        pass
+
     def finish_job(self):
         pass
 

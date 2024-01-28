@@ -1,16 +1,16 @@
 import os
 
-from dateutil import parser
 import matplotlib.pyplot as plt
 
 from src.util import config
+from src.util.data_util import parse_time
 
 
 def hourly_plot(data, label, file):
     plt.clf()
     plt.close()
     plt.cla()
-    time = [parser.parse(e1) for e1, e2 in data]
+    time = [parse_time(e1) for e1, e2 in data]
     values = [e2 for e1, e2 in data]
 
     ticks = [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]

@@ -15,6 +15,7 @@ def draw_map(filename, label, radius):
                             center=dict(lat=52.23, lon=21), zoom=10,
                             mapbox_style="open-street-map")
     fig.show()
+    fig.write_html(os.path.join(config.get_result_location(), filename.split('.')[0] + '.html'))
 
 
 def scale(value):
@@ -53,4 +54,4 @@ class MapJob(job.Job):
 
 
 def get_job():
-    return MapJob(4, 'Count', 3)
+    return MapJob(4, 'Count', 2)

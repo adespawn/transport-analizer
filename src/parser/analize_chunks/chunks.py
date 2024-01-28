@@ -8,26 +8,40 @@ import src.util.config as config
 
 class Chunk:
     def __init__(self, name):
+        self.name = name
         self.lines = []
+        self.schedule = []
         self.file = open(os.path.join(config.get_data_location(), 'locations_chunks', name), 'r')
-
-    def next_line(self):
-        return self.file.readline()
+        self.file_sch = open(os.path.join(config.get_data_location(), 'vehicle_expected', name), 'r')
 
     def do_jobs(self, tasks: jobs.JobScheduler):
+        tasks.next_cycle()
         while True:
-            tasks.next_cycle()
-            line = self.next_line()
+            line = self.file.readline()
             if not line:
                 break
-            self.lines.append(line)
+            self.lines.append(json.loads(line))
+
+        while True:
+            line = self.file_sch.readline()
+            if not line:
+                break
+            self.schedule.append(json.loads(line))
 
         while True:
             job: jobs.Job = tasks.get_next_job()
             if job is None:
                 break
             for line in self.lines:
-                job.do_job(json.loads(line))
+                try:
+                    job.do_job(line)
+                except Exception as e:
+                    pass
+            for line in self.schedule:
+                try:
+                    job.schedule_job(line)
+                except Exception as e:
+                    pass
         self.lines = []
 
 
