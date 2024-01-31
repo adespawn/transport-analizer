@@ -25,7 +25,7 @@ class AverageDelay(AverageJob):
 
     def finish_job(self):
         result = super().finish_job()
-        hourly_plot(average_data(result, 30), 'Delay (min)',
+        hourly_plot(average_data(result, 40), 'Delay (min)',
                     os.path.join(config.get_result_location(), f'avg_delay.jpg'))
         pass
 

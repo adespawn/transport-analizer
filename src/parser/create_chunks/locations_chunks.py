@@ -167,27 +167,32 @@ class SingleChunk:
     def try_single_line(self, line_schedule):
         file_name = os.path.join(config.get_data_location(), 'expected_chunks', line_schedule)
         try:
-            open(file_name, 'x').close()
+            file = open(file_name, 'x')
+            file.write('')
+            file.close()
         except Exception:
             pass
-        with open(file_name, 'r') as schedule_file:
-            added = set()
-            while True:
-                line_t = schedule_file.readline()
-                if not line_t or line_t == '\n':
-                    break
-                line = json.loads(line_t)
-                time = minute_stamp(line['Time'])
-                is_valid = False
-                if line['line'] == '1' and line['brygada'] == '1':
-                    pass
-                for i in range(-2, 3):
-                    if time + i in self.my_timestamps[line_schedule]:
-                        is_valid = True
-                if is_valid and line_t not in added:
-                    added.add(line_t)
-                    self.schedule.append((time, line))
-            self.schedule.sort(key=lambda x: x[0])
+        try:
+            with open(file_name, 'r') as schedule_file:
+                added = set()
+                while True:
+                    line_t = schedule_file.readline()
+                    if not line_t or line_t == '\n':
+                        break
+                    line = json.loads(line_t)
+                    time = minute_stamp(line['Time'])
+                    is_valid = False
+                    if line['line'] == '1' and line['brygada'] == '1':
+                        pass
+                    for i in range(-2, 3):
+                        if time + i in self.my_timestamps[line_schedule]:
+                            is_valid = True
+                    if is_valid and line_t not in added:
+                        added.add(line_t)
+                        self.schedule.append((time, line))
+                self.schedule.sort(key=lambda x: x[0])
+        except Exception:
+            pass
 
 
 def chunk_desc(line):

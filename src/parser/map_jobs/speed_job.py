@@ -24,6 +24,6 @@ class SpeedJob(basic_map_job.MapJob):
 
 
 def add_jobs(job_scheduler: job.JobScheduler) -> job.JobScheduler:
-    job_scheduler.register_job(SpeedJob(4, 'Count', 5, 70))
-    job_scheduler.register_job(SpeedJob(4, 'Count', 5, 50))
+    job_scheduler.register_job(SpeedJob(4, 'Count', 4, 70))
+    job_scheduler.register_job(SpeedJob(4, 'Count', 4, 50))
     return job_scheduler

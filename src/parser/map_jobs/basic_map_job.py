@@ -22,14 +22,26 @@ def scale(value):
     return math.log(value, 10)
 
 
+def half_digit(val):
+    val = str(val)
+    try:
+        last_dig = int(val[-1])
+        last_dig = str(int(round(int(last_dig) / 2))*2)
+        val = val[:-1] + last_dig
+        return val
+    except Exception:
+        return val
+
+
 class MapJob(job.Job):
-    def __init__(self, details, label, radius):
+    def __init__(self, details, label, radius, sub_details=False):
         super().__init__()
         self.file_name = os.path.join(config.get_result_location(), 'basic_map.txt')
         self.radius = radius
         self.details = details
         self.label = label
         self.scale_fun = scale
+        self.sub_details = sub_details
         self.map = {}
 
     def do_job(self, line):
@@ -37,6 +49,9 @@ class MapJob(job.Job):
         lat = line['Lat']
         lon = round(lon, self.details)
         lat = round(lat, self.details)
+        if self.sub_details:
+            lon = half_digit(lon)
+            lat = half_digit(lat)
         if self.map.get((lon, lat)) is None:
             self.map[(lon, lat)] = 0
         self.map[(lon, lat)] += 1
@@ -54,4 +69,4 @@ class MapJob(job.Job):
 
 
 def get_job():
-    return MapJob(4, 'Count', 2)
+    return MapJob(4, 'Count', 2, True)

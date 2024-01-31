@@ -46,19 +46,22 @@ class Chunks:
         stop_count = line['stopCount']
         line_nr = line['line']
         for entry in line['result']:
-            entry['stopID'] = stop_id
-            entry['stopCount'] = stop_count
-            entry['line'] = line_nr
-            entry['Time'] = date + ' ' + entry['czas']
-            entry.pop('czas')
-            loc = self.stops_locations[stop_id + '_' + stop_count]
-            entry['Lat'] = float(loc['szer_geo'])
-            entry['Lon'] = float(loc['dlug_geo'])
-            entry['stop_name'] = loc['nazwa_zespolu']
-            desc = line_nr + '_' + entry['brygada']
-            if not self.chunks.__contains__(desc):
-                self.chunks[desc] = SingleChunk(desc)
-            self.chunks[desc].add_line(entry)
+            try:
+                entry['stopID'] = stop_id
+                entry['stopCount'] = stop_count
+                entry['line'] = line_nr
+                entry['Time'] = date + ' ' + entry['czas']
+                entry.pop('czas')
+                loc = self.stops_locations[stop_id + '_' + stop_count]
+                entry['Lat'] = float(loc['szer_geo'])
+                entry['Lon'] = float(loc['dlug_geo'])
+                entry['stop_name'] = loc['nazwa_zespolu']
+                desc = line_nr + '_' + entry['brygada']
+                if not self.chunks.__contains__(desc):
+                    self.chunks[desc] = SingleChunk(desc)
+                self.chunks[desc].add_line(entry)
+            except KeyError:
+                pass
 
     def cleanup(self):
         file = open(os.path.join(config.get_data_location(), 'expected_chunks', 'list'), 'w+')
